@@ -13,7 +13,7 @@ def tweets(accounts):
 
     tweets = []
     for account in accounts:
-        for limit, tweet in enumerate(sntwitter.TwitterSearchScraper('from:{0} since:2023-2-01 min_replies:20 -filter:replies'.format(account)).get_items()):  #scrape tweets since the given date which are not replies to other tweets and have at least 20 replies
+        for limit, tweet in enumerate(sntwitter.TwitterSearchScraper('from:{0} since:2023-2-01 min_replies:20 -filter:replies'.format(account)).get_items()):  #scrape tweets and quote tweets since the given date which are not replies to other tweets and have at least 20 replies
             if limit >= 250:  #maximum number of tweets you want to scrape. 250 tweets from each account
                 break
             tweets.append([tweet.id, tweet.date, tweet.username, tweet.content])  #the features we want from tweets
@@ -50,7 +50,7 @@ def replies(accounts, tweets_df):
 
     replies = []
     for id in tweets_df['Id']:
-        for limit, reply in enumerate(sntwitter.TwitterSearchScraper('to:{0} OR from:{0} conversation_id:{1} AND min_faves:5'.format(tweets_df[tweets_df['Id'] == id]['Username'].values[0],id)).get_items()):  #scrape replies to scraped tweets which have at least 5 likes
+        for limit, reply in enumerate(sntwitter.TwitterSearchScraper('to:{0} OR from:{0} conversation_id:{1} AND min_faves:4'.format(tweets_df[tweets_df['Id'] == id]['Username'].values[0],id)).get_items()):  #scrape replies to scraped tweets which have at least 4 likes
             if limit >= 200:  #maximum number of replies. 200 replies to each tweet
                 break
             replies.append([id, reply.username, reply.content])  #the features we want from replies
@@ -111,7 +111,7 @@ def preprocess(all_tweets):
     for ind, username in enumerate(all_tweets['Username']): #we don't want to the user itself to be considered as an active user who is replying to the its tweet. we want other users who are interacting as active users. so we remove the user from the list of users who replied
         for replied_user in all_tweets.loc[0, 'Replied_User'][:]:
             if replied_user == username:
-                all_tweets['Replied_User'].remove(username)
+                all_tweets.loc[0, 'Replied_User'].remove(username)
 
     clean_thread = all_tweets['Thread'].apply(clean_text)
     clean_reply = all_tweets['Reply'].apply(clean_text)
