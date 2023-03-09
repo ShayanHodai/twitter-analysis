@@ -1,9 +1,12 @@
 #! /usr/bin/env python
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 import scrapper
-#import gpt
+import sentiment
 
-accounts = ['ylecun', 'alikarimi_ak8', 'elonmusk'] #accounts which we want to scrape tweets from
+import time
+start_time = time.time()
+
+accounts = ['elonmusk', 'ylecun', 'BarackObama'] #accounts which we want to scrape tweets from
 
 if __name__ == '__main__':
     tweets_df = scrapper.tweets(accounts)
@@ -12,7 +15,8 @@ if __name__ == '__main__':
     replies_df = scrapper.rm_dup(threads_df['Thread'], replies_df)
     all_tweets = scrapper.merge_dfs(tweets_df, threads_df, replies_df)
     all_tweets = scrapper.preprocess(all_tweets)
-    print(all_tweets.head())
-    #sentiment_threads = gpt.sentiment_threads(cleaned_tweets['Threads'])
-    #sentiment_replies = gpt.sentiment_replies(cleaned_tweets['Replies'])
-    #active users
+    #tweets_and_sentiments = sentiment.do(all_tweets)
+    #print(tweets_and_sentiments.head())
+    print(all_tweets)
+    print('time it took:{0}'.format(time.time()-start_time))
+
