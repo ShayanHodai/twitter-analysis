@@ -1,9 +1,7 @@
-#! /usr/bin/env python
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 import snscrape.modules.twitter as sntwitter
 import numpy as np
 import pandas as pd
+import emoji
 import re
 import warnings
 warnings.filterwarnings("ignore")
@@ -11,13 +9,15 @@ warnings.filterwarnings("ignore")
 
 def tweets(accounts):
     '''
-    function to scrape tweets from each given accounts
+    function to scrape tweets from accounts
+    input: list of accounts
+    output: tweets dataframe containing tweets from each account
     '''
 
     tweets = []
     for account in accounts:
         for limit, tweet in enumerate(sntwitter.TwitterSearchScraper('from:{0} since:2023-2-01 min_replies:20 -filter:replies'.format(account)).get_items()):  #scrape tweets and quote tweets since the given date which are not replies to other tweets and have at least 20 replies
-            if limit >= 500:  #maximum number of tweets you want to scrape. 250 tweets from each account
+            if limit >= 500:  #maximum number of tweets. 250 tweets from each account
                 break
             tweets.append([tweet.id, tweet.date, tweet.username, tweet.content])  #the features we want from tweets
 
@@ -28,19 +28,21 @@ def tweets(accounts):
 
 def threads(accounts, tweets_df):
     '''
-    function to scrape threads from each given accounts. the replies of each account to their initial tweet
+    function to scrape threads from accounts
+    inputs: list of accounts, tweets dataframe
+    output: threads dataframe containing replies of the accounts to their first tweet
     '''
 
     threads = []
     for id in tweets_df['Id']:
-        for limit, thread in enumerate(sntwitter.TwitterSearchScraper('to:{0} AND from:{0} AND conversation_id:{1}'.format(tweets_df[tweets_df['Id'] == id]['Username'].values[0],id)).get_items()):  # scrape threads to scraped tweets
+        for limit, thread in enumerate(sntwitter.TwitterSearchScraper('to:{0} AND from:{0} AND conversation_id:{1}'.format(tweets_df[tweets_df['Id'] == id]['Username'].values[0],id)).get_items()):  # scrape threads to tweets
             if limit >= 25:  # maximum number of thread tweets
                 break
             threads.append([id, thread.content])  #the features we want from threads
 
     df = pd.DataFrame(threads, columns=['Id', 'Thread'])  #creating a dataframe
 
-    array_threads = [] #we want threads be a list of arrays which each array contains all threads to the tweet
+    array_threads = [] #threads be a list of arrays which each array contains all threads to the tweet
     for id in df['Id'].unique():
         array_threads.append(df[df['Id'] == id]['Thread'].values)
 
@@ -53,19 +55,21 @@ def threads(accounts, tweets_df):
 
 def replies(accounts, tweets_df):
     '''
-    function to scrape replies to scraped tweets from each given accounts
+    function to scrape replies
+    inputs: list of accounts, tweets dataframe
+    output: replies dataframe
     '''
 
     replies = []
     for id in tweets_df['Id']:
-        for limit, reply in enumerate(sntwitter.TwitterSearchScraper('to:{0} OR from:{0} conversation_id:{1} AND min_faves:5'.format(tweets_df[tweets_df['Id'] == id]['Username'].values[0],id)).get_items()):  #scrape replies to scraped tweets which have at least 5 likes
+        for limit, reply in enumerate(sntwitter.TwitterSearchScraper('to:{0} OR from:{0} conversation_id:{1} AND min_faves:5'.format(tweets_df[tweets_df['Id'] == id]['Username'].values[0],id)).get_items()):  #scrape replies to tweets which have at least 5 likes
             if limit >= 200:  #maximum number of replies. 200 replies to each tweet
                 break
             replies.append([id, reply.username, reply.content])  #the features we want from replies
 
     df = pd.DataFrame(replies, columns=['Id', 'Username', 'Reply']) #creating a dataframe
 
-    array_replies = [] #we want replies be a list of arrays which each array contains all replies to the tweet
+    array_replies = [] #replies be a list of arrays which each array contains all replies to the tweet
     replied_users = []
     for id in df['Id'].unique():
         array_replies.append(df[df['Id'] == id]['Reply'].values)
@@ -81,7 +85,8 @@ def replies(accounts, tweets_df):
 
 def rm_dup(threads, replies_df):
     '''
-    thread tweets are in both replies_df and threads_df. we need to drop these rows from replies_df
+    thread tweets are in both replies dataframe and threads dataframe. drop these rows from replies dataframe
+    inputs: threads column, replies dataframe
     '''
 
     dup_ind = []
@@ -93,9 +98,11 @@ def rm_dup(threads, replies_df):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def merge_dfs(tweets_df, threads_df, replies_df):
      '''
-     merge all tweets, threads and replies dataframe using common Id and create a new data frame containing all information
+     merge all tweets, threads and replies dataframe using common Id and create a new data frame containing all data
+     inputs: tweets dataframe, threads dataframe, replies dataframe
+     output: all_tweets dataframe containing all data
      '''
-     noreply = [] #first we remove tweets which don't have any reply with more than 5 likes
+     noreply = [] #first remove tweets which don't have any reply with more than 5 likes
      for id in tweets_df['Id']:
          if id not in replies_df['Id'].values:
              noreply.append(tweets_df[tweets_df['Id'] == id].index.values[0])
@@ -125,8 +132,10 @@ def merge_dfs(tweets_df, threads_df, replies_df):
 def preprocess(all_tweets):
     '''
     preprocess dataframe. clean texts in threads and replies
+    input: all_tweets dataframe
+    output: cleaned all_tweets dataframe
     '''
-    for ind, username in enumerate(all_tweets['Username']): #we don't want to the user itself to be considered as an active user who is replying to the its tweet. we want other users who are interacting as active users. so we remove the user from the list of users who replied
+    for ind, username in enumerate(all_tweets['Username']): #we don't want to the user itself to be considered as an active user who is replying to its tweet. other users who are interacting are active users. so we remove the user from the list of users who replied
         for replied_user in all_tweets.loc[ind, 'Replied_User'][:]:
             if replied_user == username:
                 all_tweets.loc[ind, 'Replied_User'].remove(username)
@@ -148,16 +157,31 @@ def preprocess(all_tweets):
     all_tweets['Thread'] = clean_thread
     all_tweets['Reply'] = clean_reply
 
-    ind_meme = [] #there are some tweets that only contain a meme. since we have remove any url from tweets, now they have [' '] as an input. we want to drop these rows
-    for ind, meme in enumerate(all_tweets['Thread']):
-        if meme == [' ']:
-            ind_meme.append(ind)
-    all_tweets = all_tweets.drop(index=ind_meme).reset_index(drop=True)
 
-    for all_reply in all_tweets['Reply']:  #there are multiple replies that only have an url or emojis, since we have removed these characters from text now they only have an empty white space. they are nonsense we want remove them from the list of replies
+    for all_thread in all_tweets['Thread']: #there are some tweets that only contain a meme or a mention since we have remove any url and mention from tweets, now they have white spaces as input. remove them from the threads
+        for each_thread in all_thread[:]:
+            if each_thread == ' ':
+                all_thread.remove(' ')
+            elif each_thread == '':
+                all_thread.remove('')
+            elif each_thread == [' ']:
+                all_thread.remove([' '])
+
+    empty_threads = [] #now that we removed white spaces from list of threads there might be some threads that become empty, []. drop these rows
+    for ind, all_thread in enumerate(all_tweets['Thread']):
+        if not all_thread:
+            empty_threads.append(ind)
+
+    all_tweets = all_tweets.drop(index=empty_threads).reset_index(drop=True)
+
+    for all_reply in all_tweets['Reply']:  #there are multiple replies that only contain a meme or a mention since we have remove any url and mention from tweets, now they have white spaces as input. remove them from the threa
         for each_reply in all_reply[:]:
             if each_reply == ' ':
                 all_reply.remove(' ')
+            elif each_reply == '':
+                all_reply.remove('')
+            elif each_reply == [' ']:
+                all_reply.remove([' '])
 
     all_tweets = all_tweets.rename(columns={'Username': 'Account'}) #rename username column to account
     all_tweets = all_tweets.rename(columns={'Replied_User': 'Audience'}) #rename replied_user column to audience
@@ -170,19 +194,15 @@ def preprocess(all_tweets):
 def clean_text(text):
     '''
     function to remove any unwanted character from the text and convert some shortened form to the full form
+    input: text
+    output: cleaned text
     '''
     text = text.lower()
+    text = ''.join(char for char in text if char in emoji.UNICODE_EMOJI or ord(char) < 128) #remove any non ascii characters except emojis
     text = re.sub(r'\n', ' ', text)  #remove \n new line
     text = re.sub(r'@([A-Za-z0-9_]+)', '', text)  #remove @mentions
-    text = re.sub(r'http\S+|https\S+', '', text)  #remove http and https links
-    text = re.sub(r'[^\w\s,?!]', '', text)  #remove emojis
+    text = re.sub(r'http\S+|https\S+', ' ', text)  #remove http and https links
     text = re.sub('n\'t', ' not', text)
-    text = re.sub('\'s', ' is', text)
-    text = re.sub('\'m', ' am', text)
-    text = re.sub('\'ll', ' will', text)
-    text = re.sub('\'re', ' are', text)
-    text = re.sub('\'d', ' would', text)
     text = re.sub('\'', '', text)
-    text = re.sub(r'[^\x00-\x7F\s]+', '', text) #remove any character rather than ascii and white apace
     text = re.sub('\s+', ' ', text)  #converts any more than one space to one space
     return text
