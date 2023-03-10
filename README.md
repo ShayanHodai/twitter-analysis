@@ -1,5 +1,5 @@
 # twitter-analysis
-The repository contains code to scrape tweets from given account using snscrape module and do sentiment analysis, using hugging face API, on threads and replies to each tweet.
+The repository contains code to scrape tweets from the list of choosen accounts using snscrape module and do sentiment analysis, using hugging face API, on threads and replies to each tweet and build a REST API with 6 endpoints 
 
 
 1. clone the repository to your local machine:
@@ -12,3 +12,15 @@ source [the directory you cloned the repo]/venv/twitter/bin/activate
 pip install --upgrade pip
 5. install required modules: 
 pip install -r requirements.txt
+6. run ./main.py
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+Done! depends on the number of tweets the program takes time to run
+when the program finishes you willhave access to 6 endpoints from your local machine.
+http://127.0.0.1:5000/accounts -> returns json file of the accounts
+http://127.0.0.1:5000/threads -> returns json file of the threads
+http://127.0.0.1:5000/replies -> returns json file of the replies
+http://127.0.0.1:5000/audience -> returns json file of the audince (the accounts who replied to the tweet)
+http://127.0.0.1:5000/th -> returns json file of the replies
+http://127.0.0.1:5000/threads_sentiment -> returns json file of the threads sentiment
+http://127.0.0.1:5000/replies_sentiment -> returns json file of the replies sentiment
+
