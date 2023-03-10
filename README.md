@@ -15,7 +15,7 @@ pip install -r requirements.txt
 6. run ./main.py
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 Done! depends on the number of tweets the program takes time to run
-when the program finishes you willhave access to 6 endpoints from your local machine.
+when the program finishes you will have access to 6 endpoints from your local machine.
 http://127.0.0.1:5000/accounts -> returns json file of the accounts
 http://127.0.0.1:5000/threads -> returns json file of the threads
 http://127.0.0.1:5000/replies -> returns json file of the replies
