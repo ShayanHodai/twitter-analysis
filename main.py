@@ -1,7 +1,13 @@
 #! /usr/bin/env python
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'''
+Author: Shayan Hodai shayan.hodai@gmail.com
+Date: 9 March 2023
+Purpose: Scrape tweets from given accounts and do sentiment analysis
+'''
 import scrapper
 import sentiment
+import api
 
 import time
 start_time = time.time()
@@ -15,8 +21,7 @@ if __name__ == '__main__':
     replies_df = scrapper.rm_dup(threads_df['Thread'], replies_df)
     all_tweets = scrapper.merge_dfs(tweets_df, threads_df, replies_df)
     all_tweets = scrapper.preprocess(all_tweets)
-    #tweets_and_sentiments = sentiment.do(all_tweets)
-    #print(tweets_and_sentiments.head())
-    print(all_tweets)
-    print('time it took:{0}'.format(time.time()-start_time))
+    tweets_and_sentiments = sentiment.do(all_tweets)
+    api.initial(tweets_and_sentiments)
+
 

@@ -10,7 +10,9 @@ warnings.filterwarnings("ignore")
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def tweets(accounts):
-    '''function to scrape tweets from each given accounts'''
+    '''
+    function to scrape tweets from each given accounts
+    '''
 
     tweets = []
     for account in accounts:
@@ -20,11 +22,14 @@ def tweets(accounts):
             tweets.append([tweet.id, tweet.date, tweet.username, tweet.content])  #the features we want from tweets
 
     tweets_df = pd.DataFrame(tweets, columns=['Id', 'Date', 'Username', 'Tweet']) #creating tweets dataframe
+
     return tweets_df
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def threads(accounts, tweets_df):
-    '''function to scrape threads from each given accounts. the replies of each account to their initial tweet'''
+    '''
+    function to scrape threads from each given accounts. the replies of each account to their initial tweet
+    '''
 
     threads = []
     for id in tweets_df['Id']:
@@ -47,7 +52,9 @@ def threads(accounts, tweets_df):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def replies(accounts, tweets_df):
-    '''function to scrape replies to scraped tweets from each given accounts'''
+    '''
+    function to scrape replies to scraped tweets from each given accounts
+    '''
 
     replies = []
     for id in tweets_df['Id']:
@@ -73,7 +80,9 @@ def replies(accounts, tweets_df):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def rm_dup(threads, replies_df):
-    '''thread tweets are in both replies_df and threads_df. we need to drop these rows from replies_df'''
+    '''
+    thread tweets are in both replies_df and threads_df. we need to drop these rows from replies_df
+    '''
 
     dup_ind = []
     for thread in threads:
@@ -83,7 +92,9 @@ def rm_dup(threads, replies_df):
     return replies_df.drop(index=dup_ind).reset_index(drop=True)
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def merge_dfs(tweets_df, threads_df, replies_df):
-     '''merge all tweets, threads and replies dataframe using common Id and create a new data frame containing all information'''
+     '''
+     merge all tweets, threads and replies dataframe using common Id and create a new data frame containing all information
+     '''
      noreply = [] #first we remove tweets which don't have any reply with more than 5 likes
      for id in tweets_df['Id']:
          if id not in replies_df['Id'].values:
@@ -107,13 +118,14 @@ def merge_dfs(tweets_df, threads_df, replies_df):
 
      tweets_replies['Tweet'] = array_thread
      all_tweets = tweets_replies.rename(columns={'Tweet': 'Thread'}) #rename tweet column to thread because now it has threads not only the first tweet. the dataframe has finally all related tweets together
-     all_tweets= all_tweets.drop(columns='Id') #we don't need Ids anymore
 
      return all_tweets
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def preprocess(all_tweets):
-    '''preprocess dataframe. clean texts in threads and replies '''
+    '''
+    preprocess dataframe. clean texts in threads and replies
+    '''
     for ind, username in enumerate(all_tweets['Username']): #we don't want to the user itself to be considered as an active user who is replying to the its tweet. we want other users who are interacting as active users. so we remove the user from the list of users who replied
         for replied_user in all_tweets.loc[ind, 'Replied_User'][:]:
             if replied_user == username:
@@ -147,11 +159,18 @@ def preprocess(all_tweets):
             if each_reply == ' ':
                 all_reply.remove(' ')
 
+    all_tweets = all_tweets.rename(columns={'Username': 'Account'}) #rename username column to account
+    all_tweets = all_tweets.rename(columns={'Replied_User': 'Audience'}) #rename replied_user column to audience
+    all_tweets['Date'] = all_tweets['Date'].astype(str) #convert dtype of date column to str because timestamp is not JSON serializable which we need to be for building the API
+    all_tweets['Id'] = all_tweets['Id'].astype(str) #convert dtype of id column to str because int64 is not JSON serializable which we need to be for building the API
+
     return all_tweets
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def clean_text(text):
-    '''function to remove any unwanted character from the text and convert some shortened form to the full form'''
+    '''
+    function to remove any unwanted character from the text and convert some shortened form to the full form
+    '''
     text = text.lower()
     text = re.sub(r'\n', ' ', text)  #remove \n new line
     text = re.sub(r'@([A-Za-z0-9_]+)', '', text)  #remove @mentions
