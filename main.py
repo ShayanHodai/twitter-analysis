@@ -2,14 +2,12 @@
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 '''
 Author: Shayan Hodai shayan.hodai@gmail.com
-Date: 9 March 2023
-Purpose: Scrape tweets from given accounts and do sentiment analysis
+Date: 4 March 2023
+Purpose: Scrape tweets from choosen accounts, do sentiment analysis on threads and replies and build REST API with 6 endpoints
 '''
 import scrapper
 import sentiment
 import api
-
-import time
 
 accounts = ['elonmusk', 'ylecun', 'BarackObama'] #accounts which we want to scrape tweets from
 

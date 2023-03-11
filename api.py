@@ -6,7 +6,9 @@ app = Flask(__name__)
 
 def initial(tweets_and_sentiments):
     '''
-
+    function to initialize and build REST API with 6 endpoints to serve requests
+    input: tweets_and_sentiments dataframe
+    output: None. it just build the REST API with 6 endpoints
     '''
     num_rows = len(tweets_and_sentiments.index)
 
@@ -68,13 +70,13 @@ def initial(tweets_and_sentiments):
     with open('replies_sentiment_json', 'w') as outfile:  #write replies_sentiment to a JSON file
         json.dump(replies_sentiment, outfile)
 
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000) #to have access to the endpoints since it is running on a virtual machine on a cloud server
 
     return None
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/accounts')
+@app.route('/accounts') #create accounts endpoint
 def get_accounts():
     with open('accounts_json') as f:
         json_data = json.load(f)
@@ -82,7 +84,7 @@ def get_accounts():
     return response
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/threads')
+@app.route('/threads') #create threads endpoint
 def get_threads():
     with open('threads_json') as f:
         json_data = json.load(f)
@@ -90,7 +92,7 @@ def get_threads():
     return response
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/replies')
+@app.route('/replies') #create replies endpoint
 def get_replies():
     with open('replies_json') as f:
         json_data = json.load(f)
@@ -98,7 +100,7 @@ def get_replies():
     return response
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/audience')
+@app.route('/audience') #create audience endpoint
 def get_audience():
     with open('audience_json') as f:
         json_data = json.load(f)
@@ -106,7 +108,7 @@ def get_audience():
     return response
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/threads_sentiment')
+@app.route('/threads_sentiment') #create threads_sentiment endpoint
 def get_threads_sentiment():
     with open('threads_sentiment_json') as f:
         json_data = json.load(f)
@@ -115,7 +117,7 @@ def get_threads_sentiment():
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/replies_sentiment')
+@app.route('/replies_sentiment') #create replies_sentiment endpoint
 def get_replies_sentiment():
     with open('replies_sentiment_json') as f:
         json_data = json.load(f)
