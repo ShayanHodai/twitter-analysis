@@ -1,8 +1,30 @@
 from flask import Flask, jsonify, request, Response
+import psutil
 import json
+import time
 import pandas as pd
 app = Flask(__name__)
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+def release_port5000():
+    '''
+    first release port 5000, otherwise since the program runs automatically and port 5000 is already being used with the first run, the endpoints won't update
+    input: None
+    output: None
+    '''
+    pids = []
+    for process in psutil.process_iter(): #find the process id of the main.py program which is running on 5000 port
+        for arg in process.cmdline():
+            if 'main.py' in arg:
+                pids.append(process.pid)
+    if len(pids) > 1: #if more than one process otherwise the the first running of the program going to be terminated
+            terminate_process = psutil.Process(pids[0])
+            terminate_process.terminate()
+
+    time.sleep(10) #wait 10 seconds to release the port
+
+    return None
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def initial(tweets_and_sentiments):
     '''
@@ -32,7 +54,7 @@ def initial(tweets_and_sentiments):
         instance = {}
         instance['id'] = tweets_and_sentiments.loc[each_row, 'Id']
         instance['date'] = tweets_and_sentiments.loc[each_row, 'Date']
-        instance['audience'] = tweets_and_sentiments.loc[each_row, 'Audience']
+        instance['account'] = tweets_and_sentiments.loc[each_row, 'Account']
         instance['replies'] = tweets_and_sentiments.loc[each_row, 'Reply']
         replies.append(instance)
     with open('replies_json', 'w') as outfile:  #write replies to a JSON file
@@ -43,6 +65,7 @@ def initial(tweets_and_sentiments):
         instance = {}
         instance['id'] = tweets_and_sentiments.loc[each_row, 'Id']
         instance['date'] = tweets_and_sentiments.loc[each_row, 'Date']
+        instance['account'] = tweets_and_sentiments.loc[each_row, 'Account']
         instance['audience'] = tweets_and_sentiments.loc[each_row, 'Audience']
         audience.append(instance)
     with open('audience_json', 'w') as outfile:  #write audience to a JSON file
@@ -64,16 +87,17 @@ def initial(tweets_and_sentiments):
         instance = {}
         instance['id'] = tweets_and_sentiments.loc[each_row, 'Id']
         instance['date'] = tweets_and_sentiments.loc[each_row, 'Date']
-        instance['audience'] = tweets_and_sentiments.loc[each_row, 'Audience']
+        instance['account'] = tweets_and_sentiments.loc[each_row, 'Account']
         instance['replies_sentiment'] = tweets_and_sentiments.loc[each_row, 'Reply_Sentiment']
         replies_sentiment.append(instance)
     with open('replies_sentiment_json', 'w') as outfile:  #write replies_sentiment to a JSON file
         json.dump(replies_sentiment, outfile)
 
-    app.run(host='0.0.0.0', port=5000) #to have access to the endpoints since it is running on a virtual machine on a cloud server
+    #release_port5000()
+
+    app.run(host='0.0.0.0', port=5000) #enable access to the endpoints since it is running on a virtual machine on a cloud server
 
     return None
-
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route('/accounts') #create accounts endpoint
