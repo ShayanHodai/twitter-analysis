@@ -5,7 +5,7 @@ import emoji
 import re
 import warnings
 warnings.filterwarnings("ignore")
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def tweets(accounts):
     '''
@@ -17,7 +17,7 @@ def tweets(accounts):
     tweets = []
     for account in accounts:
         for limit, tweet in enumerate(sntwitter.TwitterSearchScraper('from:{0} since:2023-2-01 min_replies:20 -filter:replies'.format(account)).get_items()):  #scrape tweets and quote tweets since the given date which are not replies to other tweets and have at least 20 replies
-            if limit >= 500:  #maximum number of tweets. 250 tweets from each account
+            if limit >= 500:  #maximum number of tweets. 500 tweets from each account
                 break
             tweets.append([tweet.id, tweet.date, tweet.username, tweet.content])  #the features we want from tweets
 
