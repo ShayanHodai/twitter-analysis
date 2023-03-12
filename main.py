@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 '''
 Author: Shayan Hodai shayan.hodai@gmail.com
 Date: 4 March 2023
@@ -19,6 +19,8 @@ if __name__ == '__main__':
     all_tweets = scrapper.merge_dfs(tweets_df, threads_df, replies_df) #merge all tweets, threads and replies dataframe using common tweet Id
     all_tweets = scrapper.preprocess(all_tweets) #clean texts in threads and replies
     tweets_and_sentiments = sentiment.do(all_tweets) #sentiment analysis on cleaned threads and replies
+    api.release_port5000() #release port 5000 for running flask
     api.initial(tweets_and_sentiments) #initialize REST API with 6 endpoints
+
 
 
