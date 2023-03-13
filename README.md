@@ -24,4 +24,4 @@ http://127.0.0.1:5000/audience -> returns json file of the audince (the accounts
 http://127.0.0.1:5000/threads_sentiment -> returns json file of the threads sentiment
 http://127.0.0.1:5000/replies_sentiment -> returns json file of the replies sentiment
 
-OR either have access from your local machine through my virtual machine on a cloud server where the program runs automatically everyday at 00:00 EST (UTC-5) using crontab. 20.81.153.226:5000/same endpoints as above
+OR either have access from your local machine through my virtual machine on a cloud server where the program runs automatically everyday at 00:00 EST (UTC-5) using crontab. http://20.81.153.226:5000/same endpoints as above
