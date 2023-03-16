@@ -22,4 +22,5 @@ http://127.0.0.1:5000/replies/<account> -> returns json file of the replies
 http://127.0.0.1:5000/audience/<account> -> returns json file of the audince (the accounts who replied to the tweet)
 http://127.0.0.1:5000/threads_sentiment/<account> -> returns json file of the threads sentiment
 http://127.0.0.1:5000/replies_sentiment/<account> -> returns json file of the replies sentiment
+
 OR either have access to endpoints through my virtual machine running on a clouad server at http://20.81.153.226:5000/same endpoints as above
