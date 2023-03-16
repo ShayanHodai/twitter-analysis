@@ -11,7 +11,7 @@ source [the directory you cloned the repo]/venv/twitter/bin/activate
 4. upgrade pip:
 pip install --upgrade pip
 5. install required modules: 
-pip install -r requirements.txt
+pip install -r requirements.txt #packages are for ubuntu 20.04
 6. run ./main.py
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 Done! depends on the number of tweets the program takes time to run
