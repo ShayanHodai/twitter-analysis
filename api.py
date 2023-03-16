@@ -93,9 +93,7 @@ def initial(tweets_and_sentiments):
     with open('replies_sentiment_json', 'w') as outfile:  #write replies_sentiment to a JSON file
         json.dump(replies_sentiment, outfile)
 
-    #release_port5000()
-
-    app.run(host='0.0.0.0', port=5000) #enable access to the endpoints since it is running on a virtual machine on a cloud server
+    app.run(host='0.0.0.0', port=5000) #enable access to the endpoints from any network
 
     return None
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -109,41 +107,66 @@ def get_accounts():
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route('/threads') #create threads endpoint
-def get_threads():
+@app.route('/threads/<account>') #create threads endpoint with account handler
+def get_threads(account = None):
     with open('threads_json') as f:
         json_data = json.load(f)
-    response = Response(json.dumps(json_data, indent=2), mimetype='application/json')
+    if account: #if an account was chosen, filter that account data
+        filtered_data = [item for item in json_data if item['account'] == account]
+    else: #else, data from all accounts
+        filtered_data = json_data
+    response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
     return response
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route('/replies') #create replies endpoint
-def get_replies():
+@app.route('/replies/<account>') #create replies endpoint with account handler
+def get_replies(account = None):
     with open('replies_json') as f:
         json_data = json.load(f)
-    response = Response(json.dumps(json_data, indent=2), mimetype='application/json')
+    if account: #if an account was chosen, filter that account data
+        filtered_data = [item for item in json_data if item['account'] == account]
+    else: #else, data from all accounts
+        filtered_data = json_data
+    response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
     return response
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route('/audience') #create audience endpoint
-def get_audience():
+@app.route('/audience/<account>') #create audience endpoint with account handler
+def get_audience(account = None):
     with open('audience_json') as f:
         json_data = json.load(f)
-    response = Response(json.dumps(json_data, indent=2), mimetype='application/json')
+    if account: #if an account was chosen, filter that account data
+        filtered_data = [item for item in json_data if item['account'] == account]
+    else: #else, data from all accounts
+        filtered_data = json_data
+    response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
     return response
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route('/threads_sentiment') #create threads_sentiment endpoint
-def get_threads_sentiment():
+@app.route('/threads_sentiment/<account>') #create threads_sentiment endpoint with account handler
+def get_threads_sentiment(account = None):
     with open('threads_sentiment_json') as f:
         json_data = json.load(f)
-    response = Response(json.dumps(json_data, indent=2), mimetype='application/json')
+    if account: #if an account was chosen, filter that account data
+        filtered_data = [item for item in json_data if item['account'] == account]
+    else: #else, data from all accounts
+        filtered_data = json_data
+    response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
     return response
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route('/replies_sentiment') #create replies_sentiment endpoint
-def get_replies_sentiment():
+@app.route('/replies_sentiment/<account>') #create replies_sentiment endpoint with account handler
+def get_replies_sentiment(account = None):
     with open('replies_sentiment_json') as f:
         json_data = json.load(f)
-    response = Response(json.dumps(json_data, indent=2), mimetype='application/json')
+    if account: #if an account was chosen, filter that account data
+        filtered_data = [item for item in json_data if item['account'] == account]
+    else: #else, data from all accounts
+        filtered_data = json_data
+    response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
     return response
