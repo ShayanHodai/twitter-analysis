@@ -1,3 +1,4 @@
+#latest versions as of 13-03-2023
 absl-py==1.4.0
 aiofiles==22.1.0
 aiosqlite==0.18.0
