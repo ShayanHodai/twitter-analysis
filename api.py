@@ -1,172 +1,148 @@
-from flask import Flask, jsonify, request, Response
+"""
+this module build API with 6 endpoints using flask to serve requests
+"""
+from flask import Flask, Response
+import pymongo
 import psutil
 import json
-import time
-import pandas as pd
 app = Flask(__name__)
-#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-def release_port5000():
-    '''
-    first release port 5000, otherwise since the program runs automatically and port 5000 is already being used with the first run, the endpoints won't update
+
+def retrieve_db():
+    """
+    function to retrieve database from mongodb cloud
     input: None
     output: None
-    '''
-    pids = []
-    for process in psutil.process_iter(): #find the process id of the main.py program which is running on 5000 port
-        for arg in process.cmdline():
-            if 'main.py' in arg:
-                pids.append(process.pid)
-    if len(pids) > 1: #if more than one process otherwise the the first running of the program going to be terminated
-            terminate_process = psutil.Process(pids[0])
-            terminate_process.terminate()
-
-    time.sleep(10) #wait 10 seconds to release the port
-
-    return None
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-def initial(tweets_and_sentiments):
-    '''
-    function to initialize and build REST API with 6 endpoints to serve requests
-    input: tweets_and_sentiments dataframe
-    output: None. it just build the REST API with 6 endpoints
-    '''
-    num_rows = len(tweets_and_sentiments.index)
-
-    accounts = [{'accounts': tweets_and_sentiments['Account'].unique().tolist()}]
-    with open('accounts_json', 'w') as outfile:  #write accounts to a JSON file
-        json.dump(accounts, outfile)
-
-    threads = []
-    for each_row in range(num_rows):
-        instance = {}
-        instance['id'] = tweets_and_sentiments.loc[each_row, 'Id']
-        instance['date'] = tweets_and_sentiments.loc[each_row, 'Date']
-        instance['account'] = tweets_and_sentiments.loc[each_row, 'Account']
-        instance['threads'] = tweets_and_sentiments.loc[each_row, 'Thread']
-        threads.append(instance)
-    with open('threads_json', 'w') as outfile:  #write threads to a JSON file
-        json.dump(threads, outfile)
-
-    replies = []
-    for each_row in range(num_rows):
-        instance = {}
-        instance['id'] = tweets_and_sentiments.loc[each_row, 'Id']
-        instance['date'] = tweets_and_sentiments.loc[each_row, 'Date']
-        instance['account'] = tweets_and_sentiments.loc[each_row, 'Account']
-        instance['replies'] = tweets_and_sentiments.loc[each_row, 'Reply']
-        replies.append(instance)
-    with open('replies_json', 'w') as outfile:  #write replies to a JSON file
-        json.dump(replies, outfile)
-
-    audience = []
-    for each_row in range(num_rows):
-        instance = {}
-        instance['id'] = tweets_and_sentiments.loc[each_row, 'Id']
-        instance['date'] = tweets_and_sentiments.loc[each_row, 'Date']
-        instance['account'] = tweets_and_sentiments.loc[each_row, 'Account']
-        instance['audience'] = tweets_and_sentiments.loc[each_row, 'Audience']
-        audience.append(instance)
-    with open('audience_json', 'w') as outfile:  #write audience to a JSON file
-        json.dump(audience, outfile)
-
-    threads_sentiment = []
-    for each_row in range(num_rows):
-        instance = {}
-        instance['id'] = tweets_and_sentiments.loc[each_row, 'Id']
-        instance['date'] = tweets_and_sentiments.loc[each_row, 'Date']
-        instance['account'] = tweets_and_sentiments.loc[each_row, 'Account']
-        instance['threads_sentiment'] = tweets_and_sentiments.loc[each_row, 'Thread_Sentiment']
-        threads_sentiment.append(instance)
-    with open('threads_sentiment_json', 'w') as outfile:  #write threads_sentiment to a JSON file
-        json.dump(threads_sentiment, outfile)
-
-    replies_sentiment = []
-    for each_row in range(num_rows):
-        instance = {}
-        instance['id'] = tweets_and_sentiments.loc[each_row, 'Id']
-        instance['date'] = tweets_and_sentiments.loc[each_row, 'Date']
-        instance['account'] = tweets_and_sentiments.loc[each_row, 'Account']
-        instance['replies_sentiment'] = tweets_and_sentiments.loc[each_row, 'Reply_Sentiment']
-        replies_sentiment.append(instance)
-    with open('replies_sentiment_json', 'w') as outfile:  #write replies_sentiment to a JSON file
-        json.dump(replies_sentiment, outfile)
-
-    app.run(host='0.0.0.0', port=5000) #enable access to the endpoints from any network
+    """
+    conn_str = 'mongodb+srv://shayanhodai:rHxoSOBuvoNF0Bt2@cluster0.kfe3wix.mongodb.net/?retryWrites=true&w=majority'
+    client = pymongo.MongoClient(conn_str)
+    global twitter_db
+    twitter_db = client.twitter_db
+    # store documents in collections as a JSON file
+    with open('accounts_json', 'w') as outfile:
+        json.dump(list(twitter_db.accounts.find({})), outfile)
+    with open('threads_json', 'w') as outfile:
+        json.dump(list(twitter_db.threads.find({})), outfile)
+    with open('replies_json', 'w') as outfile:
+        json.dump(list(twitter_db.replies.find({})), outfile)
+    with open('audience_json', 'w') as outfile:
+        json.dump(list(twitter_db.audience.find({})), outfile)
+    with open('threads_sentiment_json', 'w') as outfile:
+        json.dump(list(twitter_db.threads_sentiment.find({})), outfile)
+    with open('replies_sentiment_json', 'w') as outfile:
+        json.dump(list(twitter_db.replies_sentiment.find({})), outfile)
 
     return None
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-@app.route('/accounts') #create accounts endpoint
+
+def initial():
+    """
+    function to initialize flask
+    input: None
+    output: None
+    """
+    used_ports = []
+    for conn in psutil.net_connections():
+        if conn.status == 'LISTEN':
+            used_ports.append(conn.laddr.port)
+    if not 5000 in used_ports:
+        app.run(host='0.0.0.0', port=5000)
+    else:
+        print('Running on http://127.0.0.1:5000')
+        pass
+
+    return None
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+@app.route('/accounts')  # create accounts endpoint
 def get_accounts():
+    """get accounts data when a user goes to the related endpoint"""
     with open('accounts_json') as f:
         json_data = json.load(f)
     response = Response(json.dumps(json_data, indent=2), mimetype='application/json')
-    return response
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/threads') #create threads endpoint
-@app.route('/threads/<account>') #create threads endpoint with account handler
-def get_threads(account = None):
+    return response
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+@app.route('/threads')  # create threads endpoint
+@app.route('/threads/<account>')  # create threads endpoint with account handler
+def get_threads(account=None):
+    """get threads data when a user goes to the related endpoint"""
     with open('threads_json') as f:
         json_data = json.load(f)
-    if account: #if an account was chosen, filter that account data
+    if account:  # if an account is chosen, filter that account data
         filtered_data = [item for item in json_data if item['account'] == account]
-    else: #else, data from all accounts
+    else:  # else, data from all accounts
         filtered_data = json_data
     response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
-    return response
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/replies') #create replies endpoint
-@app.route('/replies/<account>') #create replies endpoint with account handler
-def get_replies(account = None):
+    return response
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+@app.route('/replies')  # create replies endpoint
+@app.route('/replies/<account>')  # create replies endpoint with account handler
+def get_replies(account=None):
+    """get replies data when a user goes to the related endpoint"""
     with open('replies_json') as f:
         json_data = json.load(f)
-    if account: #if an account was chosen, filter that account data
+    if account:  # if an account is chosen, filter that account data
         filtered_data = [item for item in json_data if item['account'] == account]
-    else: #else, data from all accounts
+    else:  # else, data from all accounts
         filtered_data = json_data
     response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
-    return response
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/audience') #create audience endpoint
-@app.route('/audience/<account>') #create audience endpoint with account handler
-def get_audience(account = None):
+    return response
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+@app.route('/audience')  # create audience endpoint
+@app.route('/audience/<account>')  # create audience endpoint with account handler
+def get_audience(account=None):
+    """get audience data when a user goes to the related endpoint"""
     with open('audience_json') as f:
         json_data = json.load(f)
-    if account: #if an account was chosen, filter that account data
+    if account:  # if an account is chosen, filter that account data
         filtered_data = [item for item in json_data if item['account'] == account]
-    else: #else, data from all accounts
+    else:  # else, data from all accounts
         filtered_data = json_data
     response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
-    return response
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/threads_sentiment') #create threads_sentiment endpoint
-@app.route('/threads_sentiment/<account>') #create threads_sentiment endpoint with account handler
-def get_threads_sentiment(account = None):
+    return response
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+@app.route('/threads_sentiment')  # create threads_sentiment endpoint
+@app.route('/threads_sentiment/<account>')  # create threads_sentiment endpoint with account handler
+def get_threads_sentiment(account=None):
+    """get threads_sentiment data when a user goes to the related endpoint"""
     with open('threads_sentiment_json') as f:
         json_data = json.load(f)
-    if account: #if an account was chosen, filter that account data
+    if account:  # if an account was chosen, filter that account data
         filtered_data = [item for item in json_data if item['account'] == account]
-    else: #else, data from all accounts
+    else:  # else, data from all accounts
         filtered_data = json_data
     response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
+    
     return response
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-@app.route('/replies_sentiment') #create replies_sentiment endpoint
-@app.route('/replies_sentiment/<account>') #create replies_sentiment endpoint with account handler
-def get_replies_sentiment(account = None):
+
+@app.route('/replies_sentiment')  # create replies_sentiment endpoint
+@app.route('/replies_sentiment/<account>')  # create replies_sentiment endpoint with account handler
+def get_replies_sentiment(account=None):
+    """get replies_sentiment data when a user goes to the related endpoint"""
     with open('replies_sentiment_json') as f:
         json_data = json.load(f)
-    if account: #if an account was chosen, filter that account data
+    if account:  # if an account was chosen, filter that account data
         filtered_data = [item for item in json_data if item['account'] == account]
-    else: #else, data from all accounts
+    else:  # else, data from all accounts
         filtered_data = json_data
     response = Response(json.dumps(filtered_data, indent=2), mimetype='application/json')
+    
     return response
