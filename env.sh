@@ -1,5 +1,4 @@
 #! /bin/bash
-# latest packages as of 2023-04-01
 
 python3 -m venv $(pwd)/venv/twitter
 source $(pwd)/venv/twitter/bin/activate
