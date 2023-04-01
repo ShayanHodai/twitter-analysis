@@ -1,5 +1,5 @@
 # twitter-analysis
-The repository contains code to scrape tweets from the list of choosen accounts using snscrape module and do sentiment analysis, using hugging face API, on threads and replies to each tweet and build a REST API with 6 endpoints 
+The repository contains code to scrape tweets from the list of choosen accounts using snscrape module and do sentiment analysis, using hugging face's bert transformer, on threads and replies, create and update the database on mongodb cloud and build a REST API with 6 endpoints using flask
 
 
 1. clone the repository to your local machine:
@@ -11,11 +11,14 @@ source [the directory you cloned the repo]/venv/twitter/bin/activate
 4. upgrade pip:
 pip install --upgrade pip
 5. install required modules: 
-pip install -r requirements.txt #packages are for ubuntu 20.04
-6. run ./main.py
+pip install -r requirements.txt # packages are for ubuntu 20.04
+##### program is connected to my database, in order to create a new database and connect to yours do the followings:
+6. create a cluster on  mongodb cloud, https://cloud.mongodb.com
+7. from <connect> select <connect your application> chose python driver and version 3.6 or later and copy the provided code, replace your password  with <password>
+8. replace the code you copied with value of conn_str variable in db.py and api.py files
+##### 9. run ./main.py --account twitter account # defaults accounts are ["elonmusk", "ylecun", "BarackObama"]
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-Done! depends on the number of tweets the program takes time to run
-when the program finishes you will have access to 6 endpoints from your local machine.
+Done! depends on the number of tweets the program takes time to run, when the program finishes you created a database and built an API with 6 endpoints which you have access from your local machine.
 
 http://127.0.0.1:5000/accounts -> returns json file of the accounts
 
@@ -29,4 +32,4 @@ http://127.0.0.1:5000/threads_sentiment/account-handle -> returns json file of t
 
 http://127.0.0.1:5000/replies_sentiment/account-handle -> returns json file of the replies sentiment
 
-OR either have access to the endpoints through my virtual machine running on a clouad server at http://20.81.153.226:5000/same endpoints as above
+OR either have access to the endpoints through my virtual machine running on a cloud server at http://20.81.153.226:5000/same endpoints as above
