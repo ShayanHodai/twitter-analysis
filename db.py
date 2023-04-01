@@ -12,7 +12,7 @@ def update(tweets_and_sentiments):
     input: dataframe, all_tweets
     output: None, it updates the databases on mongodb cloud
     """
-    conn_str = 'mongodb+srv://shayanhodai:rHxoSOBuvoNF0Bt2@cluster0.kfe3wix.mongodb.net/?retryWrites=true&w=majority'
+    conn_str = 'mongodb+srv://shayanhodai:<password>@cluster0.kfe3wix.mongodb.net/?retryWrites=true&w=majority'
 
     try:
         client = pymongo.MongoClient(conn_str)  # connect to mongo db
