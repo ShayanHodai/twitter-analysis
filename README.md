@@ -9,7 +9,7 @@ git clone https://github.com/ShayanHodai/twitter-analysis.git
 source [the directory you cloned the repo]/venv/twitter/bin/activate
 ##### program is connected to my database, in order to create a new database and connect to yours do the followings:
 4. create a cluster on  mongodb cloud, https://cloud.mongodb.com
-5. from <connect> select <connect your application> chose python driver and version 3.6 or later and copy the provided code, replace your password  with <password>
+5. connect/connect your application chose python driver and version 3.6 or later and copy the provided code, replace your password 
 6. replace the code you copied with value of conn_str variable in db.py and api.py files
 ##### 7. run ./main.py --account twitter account # defaults accounts are ["elonmusk", "ylecun", "BarackObama"]
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
