@@ -15,7 +15,7 @@ def retrieve_db():
     input: None
     output: None
     """
-    conn_str = 'mongodb+srv://shayanhodai:rHxoSOBuvoNF0Bt2@cluster0.kfe3wix.mongodb.net/?retryWrites=true&w=majority'
+    conn_str = 'mongodb+srv://shayanhodai:<password>@cluster0.kfe3wix.mongodb.net/?retryWrites=true&w=majority'
     client = pymongo.MongoClient(conn_str)
     global twitter_db
     twitter_db = client.twitter_db
