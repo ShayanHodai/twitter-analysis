@@ -51,6 +51,3 @@ def bert_transformer(text):
     specific_model = pipeline('sentiment-analysis', model="finiteautomata/bertweet-base-sentiment-analysis", truncation=True)  # truncate the input sequence to the maximum length allowed by the model which is 128 for this model
 
     return specific_model(text)
-
-
-
