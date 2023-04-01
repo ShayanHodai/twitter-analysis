@@ -12,14 +12,13 @@ source [the directory you cloned the repo]/venv/twitter/bin/activate
 pip install --upgrade pip
 5. install required modules: 
 pip install -r requirements.txt # packages are for ubuntu 20.04
-#### program is connected to my database, in order to create a new database and connect to yours do the followings:
+##### program is connected to my database, in order to create a new database and connect to yours do the followings:
 6. create a cluster on  mongodb cloud, https://cloud.mongodb.com
 7. from <connect> select <connect your application> chose python driver and version 3.6 or later and copy the provided code, replace your password  with <password>
 8. replace the code you copied with value of conn_str variable in db.py and api.py files
-#### 9. run ./main.py --account twitter account # defaults accounts are ["elonmusk", "ylecun", "BarackObama"]
+##### 9. run ./main.py --account twitter account # defaults accounts are ["elonmusk", "ylecun", "BarackObama"]
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-Done! depends on the number of tweets the program takes time to run
-when the program finishes you created a database and built an API with 6 endpoints which you have access from your local machine.
+Done! depends on the number of tweets the program takes time to run, when the program finishes you created a database and built an API with 6 endpoints which you have access from your local machine.
 
 http://127.0.0.1:5000/accounts -> returns json file of the accounts
 
