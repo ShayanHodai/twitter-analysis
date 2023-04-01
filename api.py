@@ -43,13 +43,13 @@ def initial():
     input: None
     output: None
     """
-    used_ports = []
+    used_ports = []  # list of currently in use ports
     for conn in psutil.net_connections():
         if conn.status == 'LISTEN':
             used_ports.append(conn.laddr.port)
-    if not 5000 in used_ports:
+    if not 5000 in used_ports:  # if port 5000 is not in use
         app.run(host='0.0.0.0', port=5000)
-    else:
+    else:  # if port 5000 is in use
         print('Running on http://127.0.0.1:5000')
         pass
 
