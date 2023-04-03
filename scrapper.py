@@ -206,7 +206,7 @@ def clean_text(text):
     output: cleaned text
     """
     text = text.lower()
-    # text = ''.join(char for char in text if char in emoji.UNICODE_EMOJI or ord(char) < 128) # remove any non ascii characters except emojis-bert transformer is trained on english text
+    text = ''.join(char for char in text if char in emoji.UNICODE_EMOJI or ord(char) < 128) # remove any non ascii characters except emojis-bert transformer is trained on english text
     text = re.sub(r'\n', ' ', text)  # remove \n new line
     text = re.sub(r'@([A-Za-z0-9_]+)', '', text)  # remove @mentions
     text = re.sub(r'http\S+|https\S+', ' ', text)  # remove http and https links
