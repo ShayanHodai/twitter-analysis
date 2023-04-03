@@ -54,8 +54,8 @@ def initial():
         for conn in psutil.net_connections():
             if conn.laddr.port == 5000:
                 process = psutil.Process(conn.pid)
-                process.kill()
-                time.sleep(10)
+                process.kill()  # kill the process using port 5000
+                time.sleep(10)  # wait 10 seconds
         app.run(host='0.0.0.0', port=5000)
 
     return None
