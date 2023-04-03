@@ -5,6 +5,7 @@ from flask import Flask, Response
 import pymongo
 import psutil
 import json
+import time
 app = Flask(__name__)
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +16,7 @@ def retrieve_db():
     input: None
     output: None
     """
-    conn_str = 'mongodb+srv://shayanhodai:<password>@cluster0.kfe3wix.mongodb.net/?retryWrites=true&w=majority'
+    conn_str = 'mongodb+srv://shayanhodai:1234@cluster0.kfe3wix.mongodb.net/?retryWrites=true&w=majority'
     client = pymongo.MongoClient(conn_str)
     global twitter_db
     twitter_db = client.twitter_db
@@ -50,8 +51,12 @@ def initial():
     if not 5000 in used_ports:  # if port 5000 is not in use
         app.run(host='0.0.0.0', port=5000)
     else:  # if port 5000 is in use
-        print('Running on http://127.0.0.1:5000')
-        pass
+        for conn in psutil.net_connections():
+            if conn.laddr.port == 5000:
+                process = psutil.Process(conn.pid)
+                process.kill()
+                time.sleep(10)
+        app.run(host='0.0.0.0', port=5000)
 
     return None
 # ----------------------------------------------------------------------------------------------------------------------
