@@ -26,5 +26,3 @@ http://127.0.0.1:5000/audience/account-handle -> returns json file of the audinc
 http://127.0.0.1:5000/threads_sentiment/account-handle -> returns json file of the threads sentiment
 
 http://127.0.0.1:5000/replies_sentiment/account-handle -> returns json file of the replies sentiment
-
-OR either have access to the endpoints through my virtual machine running on a cloud server at http://20.81.153.226:5000/same endpoints as above
