@@ -1,5 +1,5 @@
-# twitter-analysis
-The repository contains code to scrape tweets from the list of choosen accounts using snscrape module and do sentiment analysis, using hugging face's bert transformer, on threads and replies, create and update the database on mongodb cloud and build a REST API with 6 endpoints using flask
+# Twitter Analysis
+The repository contains code to build a machine learning application which scrapes tweets from the list of chosen accounts using snscrape and does sentiment analysis, using hugging face's Bert transformer, on threads and replies, creates and updates the database on MongoDB cloud and builds a REST API with 6 endpoints using Flask.
 
 
 1. clone the repository to your local machine:
